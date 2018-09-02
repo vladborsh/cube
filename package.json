@@ -1,0 +1,33 @@
+{
+  "name": "3d-cube-2d-canvas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start ./karma.conf.js --browsers PhantomJS",
+    "test:chrome": "karma start ./karma.conf.js --browsers Chrome",
+    "webpack": "webpack -w",
+    "build": "webpack --disable-bs"
+  },
+  "author": "Vlad",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jasmine": "latest",
+    "browser-sync": "latest",
+    "browser-sync-webpack-plugin": "latest",
+    "jasmine": "latest",
+    "karma": "latest",
+    "karma-chrome-launcher": "latest",
+    "karma-firefox-launcher": "latest",
+    "karma-jasmine": "latest",
+    "karma-phantomjs-launcher": "latest",
+    "karma-webpack": "latest",
+    "phantomjs-prebuilt": "latest",
+    "typescript": "latest",
+    "webpack": "latest",
+    "webpack-cli": "^2.0.14",
+    "awesome-typescript-loader": "latest",
+    "progress-bar-webpack-plugin": "latest",
+    "html-webpack-plugin": "latest"
+  }
+}
