@@ -5,6 +5,20 @@ const CANVAS_CENTER_Y = CANVAS_HEIGHT / 2;
 const DISTANCE = 2;
 const CUBE_SIZE = 0.5;
 const PRECISION = 1000000;
+const SCALE = 170
+let alpha = 0;
+let then = Date.now();
+
+const objects = [
+  {x: -CUBE_SIZE, y: -CUBE_SIZE, z:-CUBE_SIZE},
+  {x: CUBE_SIZE, y: -CUBE_SIZE, z:-CUBE_SIZE},
+  {x: CUBE_SIZE, y: CUBE_SIZE, z:-CUBE_SIZE},
+  {x: -CUBE_SIZE, y: CUBE_SIZE, z:-CUBE_SIZE},
+  {x: -CUBE_SIZE, y: -CUBE_SIZE, z:CUBE_SIZE},
+  {x: CUBE_SIZE, y: -CUBE_SIZE, z:CUBE_SIZE},
+  {x: CUBE_SIZE, y: CUBE_SIZE, z:CUBE_SIZE},
+  {x: -CUBE_SIZE, y: CUBE_SIZE, z:CUBE_SIZE},
+];
 
 interface Vector2d {
   x: number;
@@ -70,15 +84,7 @@ function rotateZ(v: Vector3d, alpha: number): Vector3d {
   };
 }
 
-function mul(v: Vector3d, k: number): Vector3d {
-  return {
-    x : v.x * k,
-    y : v.y * k,
-    z : v.z * k,
-  };
-}
-
-function mul2d(v: Vector2d, k: number): Vector2d {
+function scale(v: Vector2d, k: number): Vector2d {
   return {
     x : v.x * k,
     y : v.y * k,
@@ -93,42 +99,41 @@ function perspective(v: Vector3d): Vector2d {
 }
 
 function transformations(v: Vector3d): Vector3d {
-  v = rotateZ(v, alpha * Math.PI / 180);
-  v = rotateY(v, alpha * Math.PI / 180);
+  v = rotateX(v, alpha * Math.PI / 180);
+  v = rotateZ(v, alpha * 0.5 * Math.PI / 180);
+  v = rotateY(v, alpha * 2 * Math.PI / 180);
   return v;
 }
 
-
-function draw() {
-  (<any>window).context.clearRect(0, 0, (<any>window).canvas.width, (<any>window).canvas.height);
-  objects.forEach(object => drawPoint(projection(object), 2, '000'));
-  for( let i = 0; i < 4; i++) {
-    drawLine(projection(objects[i]), projection(objects[(i+1)%4]), '000');
-    drawLine(projection(objects[i+4]), projection(objects[(i+1)%4+4]), '000');
-    drawLine(projection(objects[i]), projection(objects[(i+4)]), '000');
+function projection(v: Vector3d): Vector2d {
+  let v2 = scale(perspective(v), SCALE);
+  return {
+    x: CANVAS_CENTER_X + v2.x,
+    y: CANVAS_CENTER_Y + v2.y,
   }
 }
 
-function projection(v: Vector3d): Vector2d {
+function transform(v: Vector3d): Vector2d {
   v = transformations(v);
-  let v2d = perspective(v);
-  v2d = mul2d(v2d, 100);
-  return {
-    x: CANVAS_CENTER_X + v2d.x,
-    y: CANVAS_CENTER_Y + v2d.y,
-  };
+  return projection(v);
 }
 
 function update() {
   alpha += 2;
 }
 
-let alpha = 0;
+function draw() {
+  (<any>window).context.clearRect(0, 0, (<any>window).canvas.width, (<any>window).canvas.height);
+  objects.forEach(object => drawPoint(transform(object), 2, '000'));
+  for( let i = 0; i < 4; i++) {
+    drawLine(transform(objects[i]), transform(objects[(i+1)%4]), '000');
+    drawLine(transform(objects[i+4]), transform(objects[(i+1)%4+4]), '000');
+    drawLine(transform(objects[i]), transform(objects[(i+4)]), '000');
+  }
+}
 
-let then = Date.now();
-
-function animate() {
-  requestAnimationFrame(animate);
+function iteration() {
+  requestAnimationFrame(iteration);
   let now = Date.now();
   let elapsed = now - then;
   if (elapsed > 20) {
@@ -138,20 +143,9 @@ function animate() {
   }
 }
 
-const objects = [
-  {x: -CUBE_SIZE, y: -CUBE_SIZE, z:-CUBE_SIZE},
-  {x: CUBE_SIZE, y: -CUBE_SIZE, z:-CUBE_SIZE},
-  {x: CUBE_SIZE, y: CUBE_SIZE, z:-CUBE_SIZE},
-  {x: -CUBE_SIZE, y: CUBE_SIZE, z:-CUBE_SIZE},
-  {x: -CUBE_SIZE, y: -CUBE_SIZE, z:CUBE_SIZE},
-  {x: CUBE_SIZE, y: -CUBE_SIZE, z:CUBE_SIZE},
-  {x: CUBE_SIZE, y: CUBE_SIZE, z:CUBE_SIZE},
-  {x: -CUBE_SIZE, y: CUBE_SIZE, z:CUBE_SIZE},
-];
-
 function main() {
   createCanvas(CANVAS_HEIGHT, CANVAS_WIDTH);
-  animate();
+  iteration();
 }
 
 main();
